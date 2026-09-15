@@ -94,7 +94,6 @@ def solve_tree_branch_and_bound(
 
     print("Relaxed optimum:", relaxed_objective)
 
-    # heur_actions = [next(iter(actions)) for actions in states_allowed_actions]
     # TODO: if random actions are available, ignore states with 1 action + terminal states
 
     observations = solver.get_observations()
@@ -656,8 +655,8 @@ class OptimalMDPTree:
                 if node.is_leaf_node():
                     return f"{depth * '  '}{self.action_names_[node.label]}"
 
-                left_string = tree_to_string_rec(node.left_child, depth + 1)
-                right_string = tree_to_string_rec(node.right_child, depth + 1)
+                left_string = tree_to_string_rec(node.right_child, depth + 1)
+                right_string = tree_to_string_rec(node.left_child, depth + 1)
                 indentation = depth * "  "
                 return f"{indentation}if {predicate_strs[node.feature]}\n{left_string}\n{indentation}else:\n{right_string}"
 
