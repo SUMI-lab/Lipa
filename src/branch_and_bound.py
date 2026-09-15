@@ -620,7 +620,8 @@ class OptimalMDPTree:
                     sklearn_tree.children_left[node_id]
                     == sklearn_tree.children_right[node_id]
                 ):
-                    action_id = np.argmax(sklearn_tree.value[node_id])
+                    tree_action_id = np.argmax(sklearn_tree.value[node_id])
+                    action_id = self.tree_.classes_[tree_action_id]
                     return f"{depth * '  '}{self.action_names_[action_id]}"
 
                 left_string = tree_to_string_rec(
