@@ -10,6 +10,8 @@ import click
 
 import pandas as pd
 
+from pathlib import Path
+
 import os
 
 import time
@@ -20,6 +22,9 @@ def filename_to_environment(filename: str):
     
     if filename.endswith("/model.prism"):
         filename = filename.removesuffix("/model.prism")
+
+    if filename.endswith(".drn"):
+        filename = filename.removesuffix(".drn")
     
     return filename.split("/")[-1]
 
@@ -30,9 +35,10 @@ def filename_to_environment(filename: str):
 @click.option('--max_depth', default=3, type=int, help='Depth of the decision tree policy.')
 @click.option('--time_limit', default=None, type=int, help='Time limit in seconds.')
 @click.option('--add_dont_care_action', is_flag=True, help="Whether to add a random don't care action to each state")
-def run(filename, prop, model_parameters, max_depth, time_limit, add_dont_care_action):
+@click.option('--output_dir', default="out", help="Directory to output result files in")
+def run(filename, prop, model_parameters, max_depth, time_limit, add_dont_care_action, output_dir):
     model_parameters = dict(model_parameters)
-    print(filename, prop, model_parameters, max_depth, time_limit, add_dont_care_action)
+    print(filename, prop, model_parameters, max_depth, time_limit, add_dont_care_action, output_dir)
     if prop is None:
         # Assume that without property we have a path to a pickled OMDT MDP
         print("Using python sparse MDP solver")
@@ -63,8 +69,11 @@ def run(filename, prop, model_parameters, max_depth, time_limit, add_dont_care_a
     tree_string = tree.to_string()
 
     environment = filename_to_environment(filename)
-    output_filename_base = "out/lipa_" + environment + "_" + str(max_depth)
-    with open(output_filename_base + ".txt", "w") as file:
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    output_filename_base = f"{output_dir}/lipa_" + environment + "_" + str(max_depth)
+    output_filename = output_filename_base + ".txt"
+    print("Writing resulting tree in:", output_filename)
+    with open(output_filename, "w") as file:
         file.write(tree_string)
 
     results = {
@@ -82,7 +91,7 @@ def run(filename, prop, model_parameters, max_depth, time_limit, add_dont_care_a
     }
     new_row = pd.DataFrame([results])
 
-    results_filename = "out/results_lipa.csv"
+    results_filename = f"{output_dir}/results_lipa.csv"
     if os.path.isfile(results_filename):
         df = pd.read_csv(results_filename)
         df = pd.concat([df, new_row], ignore_index=True)
