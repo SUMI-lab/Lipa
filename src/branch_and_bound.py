@@ -637,9 +637,11 @@ class OptimalMDPTree:
 
             return tree_to_string_rec(0)
         else:
+            binary_features = self.tree_.binarizer_.binary_columns
+            # NOTE: we swap orders of children later since binary features actually represent "feature > 0.5"
             predicate_strs = [
                 f"{self.feature_names_[col]} <= 0.5"
-                for col in self.tree_.binarizer_.binary_columns
+                for col in binary_features
             ]
 
             if self.tree_.binarizer_.continuous_binarizer is not None:
@@ -656,10 +658,15 @@ class OptimalMDPTree:
                 if node.is_leaf_node():
                     return f"{depth * '  '}{self.action_names_[node.label]}"
 
-                left_string = tree_to_string_rec(node.right_child, depth + 1)
-                right_string = tree_to_string_rec(node.left_child, depth + 1)
+                left_string = tree_to_string_rec(node.left_child, depth + 1)
+                right_string = tree_to_string_rec(node.right_child, depth + 1)
                 indentation = depth * "  "
-                return f"{indentation}if {predicate_strs[node.feature]}\n{left_string}\n{indentation}else:\n{right_string}"
+
+                if node.feature in binary_features:
+                    return f"{indentation}if {predicate_strs[node.feature]}\n{left_string}\n{indentation}else:\n{right_string}"
+
+                # NOTE: we swap orders of children since binary features actually represent "feature > 0.5"
+                return f"{indentation}if {predicate_strs[node.feature]}\n{right_string}\n{indentation}else:\n{left_string}"
 
             streed_tree = self.tree_.get_tree()
             return tree_to_string_rec(streed_tree)
