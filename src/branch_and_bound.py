@@ -637,35 +637,35 @@ class OptimalMDPTree:
 
             return tree_to_string_rec(0)
         else:
-            binary_features = self.tree_.binarizer_.binary_columns
             # NOTE: we swap orders of children later since binary features actually represent "feature > 0.5"
-            predicate_strs = [
-                f"{self.feature_names_[col]} <= 0.5"
-                for col in binary_features
-            ]
-
-            if self.tree_.binarizer_.continuous_binarizer is not None:
-                for i, thresholds in enumerate(
-                    self.tree_.binarizer_.continuous_binarizer.thresholds_
-                ):
-                    feature_i = len(self.tree_.binarizer_.binary_columns) + i
+            binary_features = self.tree_.binarizer_.binary_columns
+            continuous_features = self.tree_.binarizer_.continuous_columns
+            predicate_strs = []
+            is_binary = []
+            if binary_features:
+                for feature_i in binary_features:
+                    predicate_strs.append(f"{self.feature_names_[feature_i]} <= 0.5")
+                    is_binary.append(True)
+            if continuous_features:
+                for feature_i in continuous_features:
+                    feature_i_index = continuous_features.index(feature_i)
+                    thresholds = self.tree_.binarizer_.continuous_binarizer.thresholds_[feature_i_index]
                     for threshold in thresholds:
                         predicate_strs.append(
                             f"{self.feature_names_[feature_i]} <= {threshold}"
                         )
+                        is_binary.append(False)
 
             def tree_to_string_rec(node, depth=0):
                 if node.is_leaf_node():
                     return f"{depth * '  '}{self.action_names_[node.label]}"
 
+                indentation = depth * "  "
                 left_string = tree_to_string_rec(node.left_child, depth + 1)
                 right_string = tree_to_string_rec(node.right_child, depth + 1)
-                indentation = depth * "  "
-
-                if node.feature in binary_features:
+                if is_binary[node.feature]:
+                    # NOTE: we swap orders of children since binary features actually represent "feature > 0.5"
                     return f"{indentation}if {predicate_strs[node.feature]}\n{left_string}\n{indentation}else:\n{right_string}"
-
-                # NOTE: we swap orders of children since binary features actually represent "feature > 0.5"
                 return f"{indentation}if {predicate_strs[node.feature]}\n{right_string}\n{indentation}else:\n{left_string}"
 
             streed_tree = self.tree_.get_tree()
