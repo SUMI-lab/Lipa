@@ -1,4 +1,4 @@
-# Lipa
+# Lipa <td align="center" valign="top" width="33.33%"><img src="https://github.com/SUMI-lab/Lipa/blob/main/sumi-lipa-logo.png?raw=true" width="100px;"/></td>
 
 **Lipa** computes optimal depth-limited **decision tree policies for Markov Decision Processes**. Given an MDP
 and a maximum depth, it returns a decision tree over the state features that maps states to actions, together
