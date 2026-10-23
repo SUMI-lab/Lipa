@@ -1,5 +1,17 @@
 # Lipa <td align="center" valign="top" width="33.33%"><img src="https://github.com/SUMI-lab/Lipa/blob/main/sumi-lipa-logo.png?raw=true" width="100px;"/></td>
 
+This repository contains code for the paper Faster Optimization of Decision Tree Policies for Markov Decision Processes by Daniël Vos and Anna Lukina, published in SAIV 2026. To cite this work you can use:
+```
+@inproceedings{vos2026faster,
+  title={Faster Optimization of Decision Tree Policies for Markov Decision Processes},
+  author={Vos, Dani{\"e}l and Lukina, Anna},
+  booktitle={International Symposium on AI Verification},
+  pages={254--270},
+  year={2026},
+  organization={Springer}
+}
+```
+
 **Lipa** computes optimal depth-limited **decision tree policies for Markov Decision Processes**. Given an MDP
 and a maximum depth, it returns a decision tree over the state features that maps states to actions, together
 with a proof of optimality (or a bound and an optimality gap if the time limit runs out first).
@@ -83,3 +95,6 @@ mdps/                 Pickled benchmark MDPs (from mdps.zip or generate_mdps.py)
 dts-uai/              PRISM benchmark models and properties
 out/                  Results, trees and logs
 ```
+## License
+
+The MIT license covers Lipa's own code. omdt/ is vendored from tudelft-cda-lab/OMDT (Vos & Verwer, IJCAI 2023) and dts-uai/ contains models from the UAI'25 artifact by Andriushchenko et al. (Zenodo 15642002, CC-BY-4.0); both remain under their original terms.
